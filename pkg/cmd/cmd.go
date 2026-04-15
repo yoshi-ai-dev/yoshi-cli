@@ -132,6 +132,15 @@ func init() {
 				},
 			},
 			{
+				Name:     "benefits",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&benefitsExpiring,
+					&benefitsSummary,
+				},
+			},
+			{
 				Name:     "investments",
 				Category: "API RESOURCE",
 				Suggest:  true,
