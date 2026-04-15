@@ -8,25 +8,25 @@ import (
 	"github.com/yoshi-ai-dev/yoshi-cli/internal/mocktest"
 )
 
-func TestMeRetrieve(t *testing.T) {
+func TestBenefitsExpiring(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"me", "retrieve",
+			"benefits", "expiring",
+			"--days", "1",
 		)
 	})
 }
 
-func TestMeSummary(t *testing.T) {
+func TestBenefitsSummary(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"me", "summary",
-			"--hidden", "true",
+			"benefits", "summary",
 		)
 	})
 }
