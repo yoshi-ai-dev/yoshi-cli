@@ -10,22 +10,15 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
 	"github.com/yoshi-ai-dev/yoshi-cli/internal/apiquery"
-	"github.com/yoshi-ai-dev/yoshi-cli/internal/requestflag"
 	"github.com/yoshi-ai-dev/yoshi-go"
 	"github.com/yoshi-ai-dev/yoshi-go/option"
 )
 
 var accountsList = cli.Command{
-	Name:    "list",
-	Usage:   "List linked financial accounts with current balances and metadata.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:      "hidden",
-			Usage:     `Allowed values: "true", "false".`,
-			QueryPath: "hidden",
-		},
-	},
+	Name:            "list",
+	Usage:           "List linked financial accounts with current balances and metadata.",
+	Suggest:         true,
+	Flags:           []cli.Flag{},
 	Action:          handleAccountsList,
 	HideHelpCommand: true,
 }
@@ -37,8 +30,6 @@ func handleAccountsList(ctx context.Context, cmd *cli.Command) error {
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
-
-	params := yoshi.AccountListParams{}
 
 	options, err := flagOptions(
 		cmd,
@@ -53,7 +44,7 @@ func handleAccountsList(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Accounts.List(ctx, params, options...)
+	_, err = client.Accounts.List(ctx, options...)
 	if err != nil {
 		return err
 	}

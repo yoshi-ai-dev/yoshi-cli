@@ -10,7 +10,6 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
 	"github.com/yoshi-ai-dev/yoshi-cli/internal/apiquery"
-	"github.com/yoshi-ai-dev/yoshi-cli/internal/requestflag"
 	"github.com/yoshi-ai-dev/yoshi-go"
 	"github.com/yoshi-ai-dev/yoshi-go/option"
 )
@@ -25,16 +24,10 @@ var meRetrieve = cli.Command{
 }
 
 var meSummary = cli.Command{
-	Name:    "summary",
-	Usage:   "Get a comprehensive financial summary including accounts, scores, and goals.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:      "hidden",
-			Usage:     `Allowed values: "true", "false".`,
-			QueryPath: "hidden",
-		},
-	},
+	Name:            "summary",
+	Usage:           "Get a comprehensive financial summary including accounts, scores, and goals.",
+	Suggest:         true,
+	Flags:           []cli.Flag{},
 	Action:          handleMeSummary,
 	HideHelpCommand: true,
 }
@@ -80,8 +73,6 @@ func handleMeSummary(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := yoshi.MeSummaryParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -95,7 +86,7 @@ func handleMeSummary(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Me.Summary(ctx, params, options...)
+	_, err = client.Me.Summary(ctx, options...)
 	if err != nil {
 		return err
 	}

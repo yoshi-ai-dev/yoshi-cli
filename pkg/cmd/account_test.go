@@ -15,7 +15,6 @@ func TestAccountsList(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"accounts", "list",
-			"--hidden", "true",
 		)
 	})
 }
