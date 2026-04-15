@@ -26,7 +26,6 @@ func TestMeSummary(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"me", "summary",
-			"--hidden", "true",
 		)
 	})
 }
