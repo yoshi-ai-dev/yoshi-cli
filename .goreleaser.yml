@@ -78,3 +78,19 @@ nfpms:
     contents:
       - src: man/man1/*.1.gz
         dst: /usr/share/man/man1/
+homebrew_casks:
+  - name: yoshi
+    repository:
+      owner: yoshi-ai-dev
+      name: homebrew-yoshi-cli
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: https://docs.yoshi.ai
+    description: Official Yoshi CLI
+    license: Apache-2.0
+    binary: "yoshi"
+    completions:
+      bash: "completions/yoshi.bash"
+      zsh: "completions/yoshi.zsh"
+      fish: "completions/yoshi.fish"
+    manpages:
+    - man/man1/yoshi.1.gz
