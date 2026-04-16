@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -123,7 +122,12 @@ func handlePaperTradingAccountsTradesCreate(ctx context.Context, cmd *cli.Comman
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "paper-trading:accounts:trades create", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		Title:          "paper-trading:accounts:trades create",
+		Transform:      transform,
+	})
 }
 
 func handlePaperTradingAccountsTradesList(ctx context.Context, cmd *cli.Command) error {
@@ -166,7 +170,12 @@ func handlePaperTradingAccountsTradesList(ctx context.Context, cmd *cli.Command)
 			return err
 		}
 		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, os.Stderr, "paper-trading:accounts:trades list", obj, format, explicitFormat, transform)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "paper-trading:accounts:trades list",
+			Transform:      transform,
+		})
 	} else {
 		iter := client.PaperTrading.Accounts.Trades.ListAutoPaging(
 			ctx,
@@ -178,6 +187,11 @@ func handlePaperTradingAccountsTradesList(ctx context.Context, cmd *cli.Command)
 		if cmd.IsSet("max-items") {
 			maxItems = cmd.Value("max-items").(int64)
 		}
-		return ShowJSONIterator(os.Stdout, os.Stderr, "paper-trading:accounts:trades list", iter, format, explicitFormat, transform, maxItems)
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			Title:          "paper-trading:accounts:trades list",
+			Transform:      transform,
+		})
 	}
 }
