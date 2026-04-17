@@ -64,6 +64,7 @@ func handlePaperTradingAccountsHoldingsList(ctx context.Context, cmd *cli.Comman
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "paper-trading:accounts:holdings list",
 		Transform:      transform,
 	})

@@ -83,6 +83,7 @@ func handlePaperTradingAccountsCreate(ctx context.Context, cmd *cli.Command) err
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "paper-trading:accounts create",
 		Transform:      transform,
 	})
@@ -121,6 +122,7 @@ func handlePaperTradingAccountsList(ctx context.Context, cmd *cli.Command) error
 	return ShowJSON(obj, ShowJSONOpts{
 		ExplicitFormat: explicitFormat,
 		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "paper-trading:accounts list",
 		Transform:      transform,
 	})
