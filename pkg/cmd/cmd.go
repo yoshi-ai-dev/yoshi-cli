@@ -197,6 +197,44 @@ func init() {
 				},
 			},
 			{
+				Name:     "webhooks:endpoints",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&webhooksEndpointsCreate,
+					&webhooksEndpointsRetrieve,
+					&webhooksEndpointsUpdate,
+					&webhooksEndpointsList,
+					&webhooksEndpointsDelete,
+					&webhooksEndpointsRotate,
+					&webhooksEndpointsTest,
+				},
+			},
+			{
+				Name:     "webhooks:deliveries",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&webhooksDeliveriesList,
+				},
+			},
+			{
+				Name:     "webhooks:events",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&webhooksEventsList,
+				},
+			},
+			{
+				Name:     "webhooks:portal",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&webhooksPortalRetrieve,
+				},
+			},
+			{
 				Name:     "approvals",
 				Category: "API RESOURCE",
 				Suggest:  true,
