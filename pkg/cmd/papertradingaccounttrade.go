@@ -20,8 +20,9 @@ var paperTradingAccountsTradesCreate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "account-id",
-			Required: true,
+			Name:      "account-id",
+			Required:  true,
+			PathParam: "accountId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "side",
@@ -59,8 +60,9 @@ var paperTradingAccountsTradesList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "account-id",
-			Required: true,
+			Name:      "account-id",
+			Required:  true,
+			PathParam: "accountId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -93,8 +95,6 @@ func handlePaperTradingAccountsTradesCreate(ctx context.Context, cmd *cli.Comman
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := yoshi.PaperTradingAccountTradeNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -105,6 +105,8 @@ func handlePaperTradingAccountsTradesCreate(ctx context.Context, cmd *cli.Comman
 	if err != nil {
 		return err
 	}
+
+	params := yoshi.PaperTradingAccountTradeNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -142,8 +144,6 @@ func handlePaperTradingAccountsTradesList(ctx context.Context, cmd *cli.Command)
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := yoshi.PaperTradingAccountTradeListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -154,6 +154,8 @@ func handlePaperTradingAccountsTradesList(ctx context.Context, cmd *cli.Command)
 	if err != nil {
 		return err
 	}
+
+	params := yoshi.PaperTradingAccountTradeListParams{}
 
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")

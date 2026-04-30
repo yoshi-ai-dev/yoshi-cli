@@ -20,8 +20,9 @@ var paperTradingAccountsHoldingsList = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "account-id",
-			Required: true,
+			Name:      "account-id",
+			Required:  true,
+			PathParam: "accountId",
 		},
 	},
 	Action:          handlePaperTradingAccountsHoldingsList,
