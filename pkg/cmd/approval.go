@@ -16,7 +16,7 @@ import (
 
 var approvalsRetrieve = cli.Command{
 	Name:    "retrieve",
-	Usage:   "Check the approval status of a pending action (paper trading account creation,\ntrade execution, etc.).",
+	Usage:   "Check the approval status of a pending action (Test Drive account creation,\ntrade execution, etc.).",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{

@@ -18,7 +18,26 @@ func TestTransactionsList(t *testing.T) {
 			"--max-items", "10",
 			"--account-id", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 			"--cursor", "cursor",
+			"--end-date", "7321-69-10",
 			"--limit", "1",
+			"--start-date", "7321-69-10",
+		)
+	})
+}
+
+func TestTransactionsChanges(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"transactions", "changes",
+			"--max-items", "10",
+			"--account-id", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+			"--cursor", "cursor",
+			"--end-date", "7321-69-10",
+			"--limit", "1",
+			"--start-date", "7321-69-10",
 		)
 	})
 }

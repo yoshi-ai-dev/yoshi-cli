@@ -16,7 +16,7 @@ import (
 
 var paperTradingAccountsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a paper trading account. Requires user approval in the Yoshi web app\nbefore the account is created.",
+	Usage:   "Create a Test Drive account. Requires user approval in the Yoshi web app before\nthe account is created.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -41,7 +41,7 @@ var paperTradingAccountsCreate = cli.Command{
 
 var paperTradingAccountsList = cli.Command{
 	Name:            "list",
-	Usage:           "List the user's paper trading accounts with current balances.",
+	Usage:           "List Test Drive accounts with current balances for the user.",
 	Suggest:         true,
 	Flags:           []cli.Flag{},
 	Action:          handlePaperTradingAccountsList,

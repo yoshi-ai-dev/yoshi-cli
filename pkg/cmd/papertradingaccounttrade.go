@@ -56,7 +56,7 @@ var paperTradingAccountsTradesCreate = cli.Command{
 
 var paperTradingAccountsTradesList = cli.Command{
 	Name:    "list",
-	Usage:   "List trade history for a paper trading account with cursor-based pagination.",
+	Usage:   "List trade history for a Test Drive account with cursor-based pagination.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{

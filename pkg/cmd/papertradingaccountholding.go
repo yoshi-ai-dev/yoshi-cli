@@ -16,7 +16,7 @@ import (
 
 var paperTradingAccountsHoldingsList = cli.Command{
 	Name:    "list",
-	Usage:   "Get current holdings/positions for a paper trading account.",
+	Usage:   "Get current holdings/positions for a Test Drive account.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
