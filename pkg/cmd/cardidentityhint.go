@@ -14,15 +14,14 @@ import (
 	"github.com/yoshi-ai-dev/yoshi-go/option"
 )
 
-var accountsList = cli.Command{
+var cardIdentityHintsList = cli.Command{
 	Name:    "list",
-	Usage:   "List linked financial accounts with display metadata and public lifecycle\nstatus.",
+	Usage:   "List source-data hints that help identify card products. Yoshi does not\nnormalize these into rewards products.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:      "hidden",
-			Usage:     `Allowed values: "true", "false".`,
-			QueryPath: "hidden",
+			Name:      "account-id",
+			QueryPath: "account_id",
 		},
 		&requestflag.Flag[string]{
 			Name:      "status",
@@ -31,11 +30,11 @@ var accountsList = cli.Command{
 			QueryPath: "status",
 		},
 	},
-	Action:          handleAccountsList,
+	Action:          handleCardIdentityHintsList,
 	HideHelpCommand: true,
 }
 
-func handleAccountsList(ctx context.Context, cmd *cli.Command) error {
+func handleCardIdentityHintsList(ctx context.Context, cmd *cli.Command) error {
 	client := yoshi.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -54,11 +53,11 @@ func handleAccountsList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := yoshi.AccountListParams{}
+	params := yoshi.CardIdentityHintListParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Accounts.List(ctx, params, options...)
+	_, err = client.CardIdentityHints.List(ctx, params, options...)
 	if err != nil {
 		return err
 	}
@@ -71,7 +70,7 @@ func handleAccountsList(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "accounts list",
+		Title:          "card-identity-hints list",
 		Transform:      transform,
 	})
 }

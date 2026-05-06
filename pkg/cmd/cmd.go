@@ -110,6 +110,15 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&transactionsList,
+					&transactionsChanges,
+				},
+			},
+			{
+				Name:     "card-identity-hints",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&cardIdentityHintsList,
 				},
 			},
 			{
