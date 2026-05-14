@@ -163,6 +163,22 @@ func init() {
 				},
 			},
 			{
+				Name:     "trades",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&tradesCreate,
+				},
+			},
+			{
+				Name:     "transfers",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&transfersCreate,
+				},
+			},
+			{
 				Name:     "income",
 				Category: "API RESOURCE",
 				Suggest:  true,
