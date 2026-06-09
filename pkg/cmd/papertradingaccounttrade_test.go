@@ -48,7 +48,6 @@ func TestPaperTradingAccountsTradesList(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"paper-trading:accounts:trades", "list",
-			"--max-items", "10",
 			"--account-id", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 			"--cursor", "cursor",
 			"--limit", "1",
