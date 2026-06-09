@@ -75,10 +75,6 @@ var paperTradingAccountsTradesList = cli.Command{
 			Default:   50,
 			QueryPath: "limit",
 		},
-		&requestflag.Flag[int64]{
-			Name:  "max-items",
-			Usage: "The maximum number of items to return (use -1 for unlimited).",
-		},
 	},
 	Action:          handlePaperTradingAccountsTradesList,
 	HideHelpCommand: true,
@@ -157,46 +153,27 @@ func handlePaperTradingAccountsTradesList(ctx context.Context, cmd *cli.Command)
 
 	params := yoshi.PaperTradingAccountTradeListParams{}
 
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.PaperTrading.Accounts.Trades.List(
+		ctx,
+		cmd.Value("account-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	if format == "raw" {
-		var res []byte
-		options = append(options, option.WithResponseBodyInto(&res))
-		_, err = client.PaperTrading.Accounts.Trades.List(
-			ctx,
-			cmd.Value("account-id").(string),
-			params,
-			options...,
-		)
-		if err != nil {
-			return err
-		}
-		obj := gjson.ParseBytes(res)
-		return ShowJSON(obj, ShowJSONOpts{
-			ExplicitFormat: explicitFormat,
-			Format:         format,
-			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "paper-trading:accounts:trades list",
-			Transform:      transform,
-		})
-	} else {
-		iter := client.PaperTrading.Accounts.Trades.ListAutoPaging(
-			ctx,
-			cmd.Value("account-id").(string),
-			params,
-			options...,
-		)
-		maxItems := int64(-1)
-		if cmd.IsSet("max-items") {
-			maxItems = cmd.Value("max-items").(int64)
-		}
-		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
-			ExplicitFormat: explicitFormat,
-			Format:         format,
-			RawOutput:      cmd.Root().Bool("raw-output"),
-			Title:          "paper-trading:accounts:trades list",
-			Transform:      transform,
-		})
-	}
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "paper-trading:accounts:trades list",
+		Transform:      transform,
+	})
 }
