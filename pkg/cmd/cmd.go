@@ -134,7 +134,10 @@ func init() {
 				Category: "API RESOURCE",
 				Suggest:  true,
 				Commands: []*cli.Command{
+					&goalsCreate,
+					&goalsUpdate,
 					&goalsList,
+					&goalsDelete,
 				},
 			},
 			{
@@ -184,6 +187,56 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&incomeRetrieve,
+				},
+			},
+			{
+				Name:     "spending",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&spendingRetrieve,
+				},
+			},
+			{
+				Name:     "net-worth",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&netWorthHistory,
+				},
+			},
+			{
+				Name:     "credit-debt",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&creditDebtRetrieve,
+				},
+			},
+			{
+				Name:     "automations",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&automationsList,
+				},
+			},
+			{
+				Name:     "briefs",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&briefsRetrieve,
+					&briefsList,
+				},
+			},
+			{
+				Name:     "securities",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&securitiesRetrieve,
+					&securitiesSearch,
 				},
 			},
 			{
