@@ -94,6 +94,7 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&accountsList,
+					&accountsCreateRealEstate,
 				},
 			},
 			{
@@ -163,6 +164,18 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&investmentsList,
+					&investmentsHoldingHistory,
+					&investmentsHoldings,
+					&investmentsPerformance,
+					&investmentsTransactions,
+				},
+			},
+			{
+				Name:     "benchmarks",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&benchmarksReplay,
 				},
 			},
 			{
@@ -237,6 +250,22 @@ func init() {
 				Commands: []*cli.Command{
 					&securitiesRetrieve,
 					&securitiesSearch,
+				},
+			},
+			{
+				Name:     "securities:options",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&securitiesOptionsChain,
+				},
+			},
+			{
+				Name:     "securities:price-history",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&securitiesPriceHistoryList,
 				},
 			},
 			{
