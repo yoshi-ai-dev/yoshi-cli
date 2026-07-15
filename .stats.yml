@@ -1,4 +1,4 @@
-configured_endpoints: 51
-openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/yoshi-ai/yoshi-54aa688a30418102b0f146ba96625b1076055141d7cbc1be0d7ce8a2a5430cb1.yml
-openapi_spec_hash: 5943a9ceede24ed4077c868d1468f9b9
-config_hash: 656793e3eeb00c6ee54ae4c044e2242b
+configured_endpoints: 52
+openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/yoshi-ai/yoshi-3eab491951b4bc556f225ed2dccae292ac72dd4f7c7262b7e80017d20050b3fa.yml
+openapi_spec_hash: 9da423844498550acdd79bf624f7d567
+config_hash: 52d2e8d2e2415ff5c9271cd3ac0d4fa6

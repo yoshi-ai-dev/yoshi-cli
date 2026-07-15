@@ -17,10 +17,10 @@ func TestTransfersCreate(t *testing.T) {
 			"transfers", "create",
 			"--amount", "1",
 			"--from-id", "x",
-			"--method", "bank_transfer",
 			"--to-id", "x",
 			"--currency-code", "USD",
 			"--description", "description",
+			"--method", "bank_transfer",
 			"--request-id", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		)
 	})
@@ -30,10 +30,10 @@ func TestTransfersCreate(t *testing.T) {
 		pipeData := []byte("" +
 			"amount: 1\n" +
 			"from_id: x\n" +
-			"method: bank_transfer\n" +
 			"to_id: x\n" +
 			"currency_code: USD\n" +
 			"description: description\n" +
+			"method: bank_transfer\n" +
 			"request_id: 182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,

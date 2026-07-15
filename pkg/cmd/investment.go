@@ -143,6 +143,46 @@ var investmentsPerformance = cli.Command{
 	HideHelpCommand: true,
 }
 
+var investmentsTaxLots = cli.Command{
+	Name:    "tax-lots",
+	Usage:   "List normalized current/open tax lots with cost basis, holding period,\nunrealized gain/loss, and coverage metadata.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "account-id",
+			Usage:     "Filter by account ID",
+			QueryPath: "account_id",
+		},
+		&requestflag.Flag[string]{
+			Name:      "cursor",
+			Usage:     "Opaque cursor from a previous response",
+			QueryPath: "cursor",
+		},
+		&requestflag.Flag[int64]{
+			Name:      "limit",
+			Usage:     "Items per page (1-100, default 50)",
+			Default:   50,
+			QueryPath: "limit",
+		},
+		&requestflag.Flag[string]{
+			Name:      "security-id",
+			Usage:     "Filter by security ID",
+			QueryPath: "security_id",
+		},
+		&requestflag.Flag[string]{
+			Name:      "symbol",
+			Usage:     "Filter by ticker symbol",
+			QueryPath: "symbol",
+		},
+		&requestflag.Flag[int64]{
+			Name:  "max-items",
+			Usage: "The maximum number of items to return (use -1 for unlimited).",
+		},
+	},
+	Action:          handleInvestmentsTaxLots,
+	HideHelpCommand: true,
+}
+
 var investmentsTransactions = cli.Command{
 	Name:    "transactions",
 	Usage:   "List investment transactions with security identifiers and explicit fee fields.",
@@ -393,6 +433,61 @@ func handleInvestmentsPerformance(ctx context.Context, cmd *cli.Command) error {
 		Title:          "investments performance",
 		Transform:      transform,
 	})
+}
+
+func handleInvestmentsTaxLots(ctx context.Context, cmd *cli.Command) error {
+	client := yoshi.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := yoshi.InvestmentTaxLotsParams{}
+
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	if format == "raw" {
+		var res []byte
+		options = append(options, option.WithResponseBodyInto(&res))
+		_, err = client.Investments.TaxLots(ctx, params, options...)
+		if err != nil {
+			return err
+		}
+		obj := gjson.ParseBytes(res)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "investments tax-lots",
+			Transform:      transform,
+		})
+	} else {
+		iter := client.Investments.TaxLotsAutoPaging(ctx, params, options...)
+		maxItems := int64(-1)
+		if cmd.IsSet("max-items") {
+			maxItems = cmd.Value("max-items").(int64)
+		}
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "investments tax-lots",
+			Transform:      transform,
+		})
+	}
 }
 
 func handleInvestmentsTransactions(ctx context.Context, cmd *cli.Command) error {
