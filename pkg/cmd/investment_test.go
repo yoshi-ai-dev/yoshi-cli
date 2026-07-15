@@ -70,6 +70,23 @@ func TestInvestmentsPerformance(t *testing.T) {
 	})
 }
 
+func TestInvestmentsTaxLots(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"investments", "tax-lots",
+			"--max-items", "10",
+			"--account-id", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+			"--cursor", "cursor",
+			"--limit", "1",
+			"--security-id", "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+			"--symbol", "x",
+		)
+	})
+}
+
 func TestInvestmentsTransactions(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {

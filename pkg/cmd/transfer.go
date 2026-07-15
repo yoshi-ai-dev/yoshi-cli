@@ -16,7 +16,7 @@ import (
 
 var transfersCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create an approval-backed bank or instant transfer.",
+	Usage:   "Create an approval-backed bank transfer (ACH). Omitted method defaults to\nbank_transfer.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[any]{
@@ -28,12 +28,6 @@ var transfersCreate = cli.Command{
 			Name:     "from-id",
 			Required: true,
 			BodyPath: "from_id",
-		},
-		&requestflag.Flag[string]{
-			Name:     "method",
-			Usage:    `Allowed values: "bank_transfer", "instant".`,
-			Required: true,
-			BodyPath: "method",
 		},
 		&requestflag.Flag[string]{
 			Name:     "to-id",
@@ -49,6 +43,12 @@ var transfersCreate = cli.Command{
 		&requestflag.Flag[string]{
 			Name:     "description",
 			BodyPath: "description",
+		},
+		&requestflag.Flag[string]{
+			Name:     "method",
+			Usage:    `Allowed values: "bank_transfer".`,
+			Default:  "bank_transfer",
+			BodyPath: "method",
 		},
 		&requestflag.Flag[string]{
 			Name:     "request-id",

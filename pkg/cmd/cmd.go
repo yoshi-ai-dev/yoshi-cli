@@ -167,6 +167,7 @@ func init() {
 					&investmentsHoldingHistory,
 					&investmentsHoldings,
 					&investmentsPerformance,
+					&investmentsTaxLots,
 					&investmentsTransactions,
 				},
 			},
