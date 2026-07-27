@@ -28,7 +28,7 @@ func TestBriefsList(t *testing.T) {
 			"--api-key", "string",
 			"briefs", "list",
 			"--max-items", "10",
-			"--brief-type", "action_requested",
+			"--brief-type", "needs_you",
 			"--cursor", "cursor",
 			"--limit", "1",
 		)

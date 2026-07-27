@@ -16,7 +16,7 @@ import (
 
 var briefsRetrieve = cli.Command{
 	Name:    "retrieve",
-	Usage:   "Get a single brief thread by ID, including the full opening message.",
+	Usage:   "Get a single Brief thread and its canonical ordered content sections.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
