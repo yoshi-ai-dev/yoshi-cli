@@ -31,7 +31,7 @@ var benefitsExpiring = cli.Command{
 
 var benefitsSummary = cli.Command{
 	Name:            "summary",
-	Usage:           "Get a summary of the user's card benefit periods with usage and remaining value.",
+	Usage:           "Get a summary of the user's card benefit periods with usage and remaining value.\nA period that has ended on the caller's calendar day is excluded, so the\nreported totals depend on the timezone.",
 	Suggest:         true,
 	Flags:           []cli.Flag{},
 	Action:          handleBenefitsSummary,
