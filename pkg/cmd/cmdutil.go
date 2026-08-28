@@ -323,21 +323,29 @@ func shouldUseColors(w io.Writer) bool {
 	return isTerminal(w)
 }
 
-func formatJSON(expectedOutput *os.File, title string, res gjson.Result, format string, transform string) ([]byte, error) {
-	if transform != "" {
-		transformed := res.Get(transform)
+func formatJSON(res gjson.Result, opts ShowJSONOpts) ([]byte, error) {
+	if opts.Transform != "" {
+		transformed := res.Get(opts.Transform)
 		if transformed.Exists() {
 			res = transformed
 		}
 	}
-	switch strings.ToLower(format) {
+	// Modeled after `jq -r` (`--raw-output`): if the result is a string, print it without JSON quotes so that
+	// it's easier to pipe into other programs.
+	if opts.RawOutput && res.Type == gjson.String {
+		return []byte(res.Str + "\n"), nil
+	}
+	switch strings.ToLower(opts.Format) {
 	case "auto":
-		return formatJSON(expectedOutput, title, res, "json", "")
+		autoOpts := opts
+		autoOpts.Format = "json"
+		autoOpts.Transform = ""
+		return formatJSON(res, autoOpts)
 	case "pretty":
-		return []byte(jsonview.RenderJSON(title, res) + "\n"), nil
+		return []byte(jsonview.RenderJSON(opts.Title, res) + "\n"), nil
 	case "json":
 		prettyJSON := pretty.Pretty([]byte(res.Raw))
-		if shouldUseColors(expectedOutput) {
+		if shouldUseColors(opts.Stdout) {
 			return pretty.Color(prettyJSON, pretty.TerminalStyle), nil
 		} else {
 			return prettyJSON, nil
@@ -345,7 +353,7 @@ func formatJSON(expectedOutput *os.File, title string, res gjson.Result, format 
 	case "jsonl":
 		// @ugly is gjson syntax for "no whitespace", so it fits on one line
 		oneLineJSON := res.Get("@ugly").Raw
-		if shouldUseColors(expectedOutput) {
+		if shouldUseColors(opts.Stdout) {
 			bytes := append(pretty.Color([]byte(oneLineJSON), pretty.TerminalStyle), '\n')
 			return bytes, nil
 		} else {
@@ -359,45 +367,67 @@ func formatJSON(expectedOutput *os.File, title string, res gjson.Result, format 
 		if err := json2yaml.Convert(&yaml, input); err != nil {
 			return nil, err
 		}
-		_, err := expectedOutput.Write([]byte(yaml.String()))
+		_, err := opts.Stdout.Write([]byte(yaml.String()))
 		return nil, err
 	default:
-		return nil, fmt.Errorf("Invalid format: %s, valid formats are: %s", format, strings.Join(OutputFormats, ", "))
+		return nil, fmt.Errorf("Invalid format: %s, valid formats are: %s", opts.Format, strings.Join(OutputFormats, ", "))
 	}
 }
 
 const warningExploreNotSupported = "Warning: Output format 'explore' not supported for non-terminal output; falling back to 'json'\n"
 
-// Display JSON to the user in various different formats. The explicitFormat parameter indicates
-// whether the format was explicitly set by the user (via --format), which controls whether we
-// silently fall back to json when explore is requested on non-terminal output. Warnings are
-// written to stderr.
-func ShowJSON(out *os.File, stderr io.Writer, title string, res gjson.Result, format string, explicitFormat bool, transform string) error {
-	if transform != "" {
-		transformed := res.Get(transform)
-		if transformed.Exists() {
-			res = transformed
-		}
-	}
+// ShowJSONOpts configures how JSON output is displayed.
+type ShowJSONOpts struct {
+	ExplicitFormat bool      // true if the user explicitly passed --format
+	Format         string    // output format (auto, explore, json, jsonl, pretty, raw, yaml)
+	RawOutput      bool      // like jq -r: print strings without JSON quotes
+	Stderr         io.Writer // stderr for warnings; injectable for testing; defaults to os.Stderr
+	Stdout         *os.File  // stdout (or pager); injectable for testing; defaults to os.Stdout
+	Title          string    // display title
+	Transform      string    // GJSON path to extract before displaying
+}
 
-	switch strings.ToLower(format) {
+func (o *ShowJSONOpts) setDefaults() {
+	if o.Stderr == nil {
+		o.Stderr = os.Stderr
+	}
+	if o.Stdout == nil {
+		o.Stdout = os.Stdout
+	}
+}
+
+// ShowJSON displays a single JSON result to the user.
+func ShowJSON(res gjson.Result, opts ShowJSONOpts) error {
+	opts.setDefaults()
+
+	switch strings.ToLower(opts.Format) {
 	case "auto":
-		return ShowJSON(out, stderr, title, res, "json", explicitFormat, "")
+		autoOpts := opts
+		autoOpts.Format = "json"
+		return ShowJSON(res, autoOpts)
 	case "explore":
-		if !isTerminal(out) {
-			if explicitFormat {
-				fmt.Fprint(stderr, warningExploreNotSupported)
+		if !isTerminal(opts.Stdout) {
+			if opts.ExplicitFormat {
+				fmt.Fprint(opts.Stderr, warningExploreNotSupported)
 			}
-			return ShowJSON(out, stderr, title, res, "json", explicitFormat, transform)
+			jsonOpts := opts
+			jsonOpts.Format = "json"
+			return ShowJSON(res, jsonOpts)
 		}
-		return jsonview.ExploreJSON(title, res)
+		if opts.Transform != "" {
+			transformed := res.Get(opts.Transform)
+			if transformed.Exists() {
+				res = transformed
+			}
+		}
+		return jsonview.ExploreJSON(opts.Title, res)
 	default:
-		bytes, err := formatJSON(out, title, res, format, transform)
+		bytes, err := formatJSON(res, opts)
 		if err != nil {
 			return err
 		}
 
-		_, err = out.Write(bytes)
+		_, err = opts.Stdout.Write(bytes)
 		return err
 	}
 }
@@ -411,18 +441,18 @@ type hasRawJSON interface {
 	RawJSON() string
 }
 
-// For an iterator over different value types, display its values to the user in
-// different formats.
-// -1 is used to signal no limit of items to display
-func ShowJSONIterator[T any](stdout *os.File, stderr io.Writer, title string, iter jsonview.Iterator[T], format string, explicitFormat bool, transform string, itemsToDisplay int64) error {
-	if format == "explore" {
-		if isTerminal(stdout) {
-			return jsonview.ExploreJSONStream(title, iter)
+// ShowJSONIterator displays an iterator of values to the user. Use itemsToDisplay = -1 for no limit.
+func ShowJSONIterator[T any](iter jsonview.Iterator[T], itemsToDisplay int64, opts ShowJSONOpts) error {
+	opts.setDefaults()
+
+	if opts.Format == "explore" {
+		if isTerminal(opts.Stdout) {
+			return jsonview.ExploreJSONStream(opts.Title, iter)
 		}
-		if explicitFormat {
-			fmt.Fprint(stderr, warningExploreNotSupported)
+		if opts.ExplicitFormat {
+			fmt.Fprint(opts.Stderr, warningExploreNotSupported)
 		}
-		format = "json"
+		opts.Format = "json"
 	}
 
 	terminalWidth, terminalHeight, err := term.GetSize(os.Stdout.Fd())
@@ -448,7 +478,7 @@ func ShowJSONIterator[T any](stdout *os.File, stderr io.Writer, title string, it
 			}
 			obj = gjson.ParseBytes(jsonData)
 		}
-		json, err := formatJSON(stdout, title, obj, format, transform)
+		json, err := formatJSON(obj, opts)
 		if err != nil {
 			return err
 		}
@@ -465,7 +495,7 @@ func ShowJSONIterator[T any](stdout *os.File, stderr io.Writer, title string, it
 	}
 
 	if !usePager {
-		_, err := stdout.Write(output)
+		_, err := opts.Stdout.Write(output)
 		if err != nil {
 			return err
 		}
@@ -473,12 +503,14 @@ func ShowJSONIterator[T any](stdout *os.File, stderr io.Writer, title string, it
 		return iter.Err()
 	}
 
-	return streamOutput(title, func(pager *os.File) error {
-		// Write the output we used during the initial terminal size computation
+	return streamOutput(opts.Title, func(pager *os.File) error {
 		_, err := pager.Write(output)
 		if err != nil {
 			return err
 		}
+
+		pagerOpts := opts
+		pagerOpts.Stdout = pager
 
 		for iter.Next() {
 			if itemsToDisplay == 0 {
@@ -495,7 +527,7 @@ func ShowJSONIterator[T any](stdout *os.File, stderr io.Writer, title string, it
 				}
 				obj = gjson.ParseBytes(jsonData)
 			}
-			if err := ShowJSON(pager, stderr, title, obj, format, explicitFormat, transform); err != nil {
+			if err := ShowJSON(obj, pagerOpts); err != nil {
 				return err
 			}
 			itemsToDisplay -= 1

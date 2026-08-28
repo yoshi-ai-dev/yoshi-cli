@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -17,7 +16,7 @@ import (
 
 var paperTradingAccountsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Create a paper trading account. Requires user approval in the Yoshi web app\nbefore the account is created.",
+	Usage:   "Create a Test Drive account. Requires user approval in the Yoshi web app before\nthe account is created.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -42,7 +41,7 @@ var paperTradingAccountsCreate = cli.Command{
 
 var paperTradingAccountsList = cli.Command{
 	Name:            "list",
-	Usage:           "List the user's paper trading accounts with current balances.",
+	Usage:           "List Test Drive accounts with current balances for the user.",
 	Suggest:         true,
 	Flags:           []cli.Flag{},
 	Action:          handlePaperTradingAccountsList,
@@ -57,8 +56,6 @@ func handlePaperTradingAccountsCreate(ctx context.Context, cmd *cli.Command) err
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := yoshi.PaperTradingAccountNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -69,6 +66,8 @@ func handlePaperTradingAccountsCreate(ctx context.Context, cmd *cli.Command) err
 	if err != nil {
 		return err
 	}
+
+	params := yoshi.PaperTradingAccountNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -81,7 +80,13 @@ func handlePaperTradingAccountsCreate(ctx context.Context, cmd *cli.Command) err
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "paper-trading:accounts create", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "paper-trading:accounts create",
+		Transform:      transform,
+	})
 }
 
 func handlePaperTradingAccountsList(ctx context.Context, cmd *cli.Command) error {
@@ -114,5 +119,11 @@ func handlePaperTradingAccountsList(ctx context.Context, cmd *cli.Command) error
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "paper-trading:accounts list", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "paper-trading:accounts list",
+		Transform:      transform,
+	})
 }

@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -17,12 +16,13 @@ import (
 
 var paperTradingAccountsHoldingsList = cli.Command{
 	Name:    "list",
-	Usage:   "Get current holdings/positions for a paper trading account.",
+	Usage:   "Get current holdings/positions for a Test Drive account.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "account-id",
-			Required: true,
+			Name:      "account-id",
+			Required:  true,
+			PathParam: "accountId",
 		},
 	},
 	Action:          handlePaperTradingAccountsHoldingsList,
@@ -62,5 +62,11 @@ func handlePaperTradingAccountsHoldingsList(ctx context.Context, cmd *cli.Comman
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "paper-trading:accounts:holdings list", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "paper-trading:accounts:holdings list",
+		Transform:      transform,
+	})
 }

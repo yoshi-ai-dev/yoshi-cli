@@ -73,6 +73,11 @@ func init() {
 				Name:  "transform-error",
 				Usage: "The GJSON transformation for errors.",
 			},
+			&cli.BoolFlag{
+				Name:    "raw-output",
+				Aliases: []string{"r"},
+				Usage:   "If the result is a string, print it without JSON quotes. This can be useful for making output transforms talk to non-JSON-based systems.",
+			},
 			&requestflag.Flag[string]{
 				Name:    "api-key",
 				Sources: cli.EnvVars("YOSHI_API_KEY"),
@@ -89,6 +94,7 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&accountsList,
+					&accountsCreateRealEstate,
 				},
 			},
 			{
@@ -105,6 +111,15 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&transactionsList,
+					&transactionsChanges,
+				},
+			},
+			{
+				Name:     "card-identity-hints",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&cardIdentityHintsList,
 				},
 			},
 			{
@@ -120,7 +135,10 @@ func init() {
 				Category: "API RESOURCE",
 				Suggest:  true,
 				Commands: []*cli.Command{
+					&goalsCreate,
+					&goalsUpdate,
 					&goalsList,
+					&goalsDelete,
 				},
 			},
 			{
@@ -146,6 +164,35 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&investmentsList,
+					&investmentsHoldingHistory,
+					&investmentsHoldings,
+					&investmentsPerformance,
+					&investmentsTaxLots,
+					&investmentsTransactions,
+				},
+			},
+			{
+				Name:     "benchmarks",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&benchmarksReplay,
+				},
+			},
+			{
+				Name:     "trades",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&tradesCreate,
+				},
+			},
+			{
+				Name:     "transfers",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&transfersCreate,
 				},
 			},
 			{
@@ -154,6 +201,72 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&incomeRetrieve,
+				},
+			},
+			{
+				Name:     "spending",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&spendingRetrieve,
+				},
+			},
+			{
+				Name:     "net-worth",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&netWorthHistory,
+				},
+			},
+			{
+				Name:     "credit-debt",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&creditDebtRetrieve,
+				},
+			},
+			{
+				Name:     "automations",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&automationsList,
+				},
+			},
+			{
+				Name:     "briefs",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&briefsRetrieve,
+					&briefsList,
+				},
+			},
+			{
+				Name:     "securities",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&securitiesRetrieve,
+					&securitiesSearch,
+				},
+			},
+			{
+				Name:     "securities:options",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&securitiesOptionsChain,
+				},
+			},
+			{
+				Name:     "securities:price-history",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&securitiesPriceHistoryList,
 				},
 			},
 			{
@@ -189,6 +302,44 @@ func init() {
 				Commands: []*cli.Command{
 					&paperTradingAccountsTradesCreate,
 					&paperTradingAccountsTradesList,
+				},
+			},
+			{
+				Name:     "webhooks:endpoints",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&webhooksEndpointsCreate,
+					&webhooksEndpointsRetrieve,
+					&webhooksEndpointsUpdate,
+					&webhooksEndpointsList,
+					&webhooksEndpointsDelete,
+					&webhooksEndpointsRotate,
+					&webhooksEndpointsTest,
+				},
+			},
+			{
+				Name:     "webhooks:deliveries",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&webhooksDeliveriesList,
+				},
+			},
+			{
+				Name:     "webhooks:events",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&webhooksEventsList,
+				},
+			},
+			{
+				Name:     "webhooks:portal",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&webhooksPortalRetrieve,
 				},
 			},
 			{

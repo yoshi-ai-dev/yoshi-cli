@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -17,12 +16,13 @@ import (
 
 var approvalsRetrieve = cli.Command{
 	Name:    "retrieve",
-	Usage:   "Check the approval status of a pending action (paper trading account creation,\ntrade execution, etc.).",
+	Usage:   "Check the approval status of a pending action (Test Drive account creation,\ntrade execution, etc.).",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "thread-id",
-			Required: true,
+			Name:      "thread-id",
+			Required:  true,
+			PathParam: "threadId",
 		},
 	},
 	Action:          handleApprovalsRetrieve,
@@ -62,5 +62,11 @@ func handleApprovalsRetrieve(ctx context.Context, cmd *cli.Command) error {
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "approvals retrieve", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "approvals retrieve",
+		Transform:      transform,
+	})
 }

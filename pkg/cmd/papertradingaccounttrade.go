@@ -5,7 +5,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
@@ -21,8 +20,9 @@ var paperTradingAccountsTradesCreate = cli.Command{
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "account-id",
-			Required: true,
+			Name:      "account-id",
+			Required:  true,
+			PathParam: "accountId",
 		},
 		&requestflag.Flag[string]{
 			Name:     "side",
@@ -56,12 +56,13 @@ var paperTradingAccountsTradesCreate = cli.Command{
 
 var paperTradingAccountsTradesList = cli.Command{
 	Name:    "list",
-	Usage:   "List trade history for a paper trading account with cursor-based pagination.",
+	Usage:   "List trade history for a Test Drive account with cursor-based pagination.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "account-id",
-			Required: true,
+			Name:      "account-id",
+			Required:  true,
+			PathParam: "accountId",
 		},
 		&requestflag.Flag[string]{
 			Name:      "cursor",
@@ -73,10 +74,6 @@ var paperTradingAccountsTradesList = cli.Command{
 			Usage:     "Items per page (1-100, default 50)",
 			Default:   50,
 			QueryPath: "limit",
-		},
-		&requestflag.Flag[int64]{
-			Name:  "max-items",
-			Usage: "The maximum number of items to return (use -1 for unlimited).",
 		},
 	},
 	Action:          handlePaperTradingAccountsTradesList,
@@ -94,8 +91,6 @@ func handlePaperTradingAccountsTradesCreate(ctx context.Context, cmd *cli.Comman
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := yoshi.PaperTradingAccountTradeNewParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -106,6 +101,8 @@ func handlePaperTradingAccountsTradesCreate(ctx context.Context, cmd *cli.Comman
 	if err != nil {
 		return err
 	}
+
+	params := yoshi.PaperTradingAccountTradeNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -123,7 +120,13 @@ func handlePaperTradingAccountsTradesCreate(ctx context.Context, cmd *cli.Comman
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(os.Stdout, os.Stderr, "paper-trading:accounts:trades create", obj, format, explicitFormat, transform)
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "paper-trading:accounts:trades create",
+		Transform:      transform,
+	})
 }
 
 func handlePaperTradingAccountsTradesList(ctx context.Context, cmd *cli.Command) error {
@@ -137,8 +140,6 @@ func handlePaperTradingAccountsTradesList(ctx context.Context, cmd *cli.Command)
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
 
-	params := yoshi.PaperTradingAccountTradeListParams{}
-
 	options, err := flagOptions(
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
@@ -150,34 +151,29 @@ func handlePaperTradingAccountsTradesList(ctx context.Context, cmd *cli.Command)
 		return err
 	}
 
+	params := yoshi.PaperTradingAccountTradeListParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.PaperTrading.Accounts.Trades.List(
+		ctx,
+		cmd.Value("account-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	if format == "raw" {
-		var res []byte
-		options = append(options, option.WithResponseBodyInto(&res))
-		_, err = client.PaperTrading.Accounts.Trades.List(
-			ctx,
-			cmd.Value("account-id").(string),
-			params,
-			options...,
-		)
-		if err != nil {
-			return err
-		}
-		obj := gjson.ParseBytes(res)
-		return ShowJSON(os.Stdout, os.Stderr, "paper-trading:accounts:trades list", obj, format, explicitFormat, transform)
-	} else {
-		iter := client.PaperTrading.Accounts.Trades.ListAutoPaging(
-			ctx,
-			cmd.Value("account-id").(string),
-			params,
-			options...,
-		)
-		maxItems := int64(-1)
-		if cmd.IsSet("max-items") {
-			maxItems = cmd.Value("max-items").(int64)
-		}
-		return ShowJSONIterator(os.Stdout, os.Stderr, "paper-trading:accounts:trades list", iter, format, explicitFormat, transform, maxItems)
-	}
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "paper-trading:accounts:trades list",
+		Transform:      transform,
+	})
 }
